@@ -1,0 +1,32 @@
+version: 0.1
+lint:
+  files:
+    - name: terrafrom
+      extensions:
+        - tf
+  downloads:
+    - name: tfsec
+      downloads:
+        - url: https://github.com/aquasecurity/tfsec/releases/download/v${version}/tfsec-${os}-${cpu}
+          os:
+            linux: linux
+            macos: darwin
+          cpu:
+            x86_64: amd64
+            arm_64: arm64
+
+  definitions:
+    - name: tfsec
+      download: tfsec
+      environment:
+        - name: PATH
+          list:
+            - ${linter}
+      commands:
+        - output: sarif
+          run: tfsec --format sarif
+          success_codes: [0,1]
+          read_output_from: stdout
+      version_command:
+        parse_regex: ${semver}
+        run: tfsec -v
